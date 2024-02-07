@@ -18,7 +18,39 @@ app.get('/', (req: Request, res: Response) =>
   })
 );
 
-app.post('/mail', async (req: Request, res: Response) => {
+// for multiple email sending
+const fetchEmails = async () => {
+  const response = await fetch('https://jsonplaceholder.typicode.com/users');
+  return (await response.json()).map((user: any, index: number) => ({
+    email: user.email,
+    index,
+  }));
+};
+
+app.post('/bulk-mail', async (req: Request, res: Response) => {
+  try {
+    fetchEmails()
+      .then((emails) => {
+        const emailPromises = emails.map(async (data: any) => {
+          if (data.index > 3) return; // remove if on premium plan only
+          await sendEmail(
+            `Sample Subject ${data.index}`,
+            `Sample Message ${data.index}`,
+            data.email
+          );
+        });
+
+        return Promise.all(emailPromises);
+      })
+      .then(() => {
+        res.status(200).json({ Message: 'Successfully sent emails.' });
+      });
+  } catch (e) {
+    res.json({ 'Internal Server Error': e });
+  }
+});
+
+app.post('/single-mail', async (req: Request, res: Response) => {
   try {
     await sendEmail(
       'Sample Subject',
@@ -26,10 +58,11 @@ app.post('/mail', async (req: Request, res: Response) => {
       'sample_email@mail.com'
     );
     res.status(200).json({ Message: 'Successfully sent email!' });
-  } catch(e) {
-    res.json({'Error': e});
+  } catch (e) {
+    res.json({ 'Internal Server Error': e });
   }
 });
+
 app.listen(port, () => {
   console.log(`Server is listening on port ${port}`);
 });

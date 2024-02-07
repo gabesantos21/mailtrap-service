@@ -8,6 +8,6 @@ To get started:
 
 3. Select nodemailer and apply respective values to env file.
 
-4. Test endpoint at [http://localhost:5050/mail](http://localhost:5050/mail) with POST method.
+4. Test endpoint at [http://localhost:5050/single-mail](http://localhost:5050/single-mail) or [http://localhost:5050/bulk-mail](http://localhost:5050/bullk-mail) with POST method.
 
 5. Check Mailtrap Test Inbox.
